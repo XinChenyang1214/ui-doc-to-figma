@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>UI Doc Bridge</title>
+  </head>
+  <body>
+    <script>
+      const BASE = "http://127.0.0.1:38450"
+      let running = true
+
+      async function postResult(payload) {
+        try {
+          await fetch(`${BASE}/result`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          })
+        } catch (_) {}
+      }
+
+      async function pollNext() {
+        if (!running) return
+        try {
+          const res = await fetch(`${BASE}/next`)
+          if (res.status === 200) {
+            const cmd = await res.json()
+            parent.postMessage({ pluginMessage: cmd }, "*")
+          }
+        } catch (_) {}
+        setTimeout(pollNext, 250)
+      }
+
+      window.onmessage = (event) => {
+        const msg = event.data && event.data.pluginMessage
+        if (!msg || !msg.id) return
+        if (typeof msg.ok === "boolean") {
+          postResult(msg)
+        }
+      }
+
+      pollNext()
+    </script>
+  </body>
+</html>

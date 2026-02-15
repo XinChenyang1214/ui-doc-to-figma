@@ -1,0 +1,4 @@
+interface:
+  display_name: "UI Doc to Figma"
+  short_description: "Auto-edit Figma from UI docs via self-hosted bridge"
+  default_prompt: "Use $ui-doc-to-figma to parse /Users/xinchenyang/ai_project/prophet/docs/ui-spec-v2.md in incremental mode, generate task-scoped temp files under auto-figma, dry-run, execute writes with the local bridge plugin, and clean task temp files after success."
