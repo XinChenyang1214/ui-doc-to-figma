@@ -71,7 +71,7 @@ scripts/list_open_figma_files.py
 
 #### Step 2: Generate Edit Plan
 
-Generate Figma operation plan from UI Markdown document:
+Generate Figma operation plan from UI Markdown document or HTML source:
 
 ```bash
 # macOS/Linux
@@ -89,6 +89,19 @@ python scripts/ui_doc_to_figma_plan.py `
   --task-id task-001 `
   --device ios `
   --output "$env:TEMP\auto-figma\my-project_task-001_plan.json"
+```
+
+
+Generate from HTML (strict parity workflow):
+
+```bash
+python3 scripts/html_to_figma_plan.py \
+  --input /path/to/page.html \
+  --project-name my-project \
+  --task-id task-html-001 \
+  --frame-width 1440 \
+  --frame-height 1024 \
+  --output /tmp/auto-figma/my-project_task-html-001_plan.json
 ```
 
 #### Step 3: Dry Run Test
@@ -132,11 +145,13 @@ ui-doc-to-figma/
 ├── scripts/
 │   ├── ui_doc_to_figma_plan.py       # Main script for generating edit plans
 │   ├── figma_bridge_apply_plan.py    # Script for executing edit plans
-│   └── list_open_figma_files.py      # Script to list open Figma files
+│   ├── list_open_figma_files.py      # Script to list open Figma files
+│   └── html_to_figma_plan.py         # Script to generate plan from HTML
 ├── references/                        # Reference documentation
 │   ├── auto-edit-plan-format.md      # Edit plan format reference
 │   ├── bridge-plugin-setup.md        # Plugin setup guide
-│   └── doc-to-figma-template.md      # UI document template
+│   ├── doc-to-figma-template.md      # UI document template
+│   └── html-to-figma-parity.md       # HTML parity restoration guide
 └── agents/
     └── openai.yaml                    # Configuration file
 ```
@@ -157,6 +172,18 @@ Generate Figma operation plan from Markdown document.
 - `--full-refresh`: Full refresh (use on initial build)
 - `--max-screens`: Maximum number of screens
 - `--page-name`: Page name
+
+### `scripts/html_to_figma_plan.py`
+
+Generate Figma operation plan from HTML document with strict parity target.
+
+**Key Parameters:**
+- `--input`: HTML document path (required)
+- `--output`: Output edit plan JSON file path
+- `--project-name`: Project name
+- `--task-id`: Task ID (for file isolation)
+- `--frame-width`: Root frame width
+- `--frame-height`: Root frame height
 
 ### `scripts/figma_bridge_apply_plan.py`
 
@@ -255,6 +282,7 @@ python scripts/figma_bridge_apply_plan.py ...
 - [SKILL.md](SKILL.md) - Detailed skill definition and workflow
 - [references/auto-edit-plan-format.md](references/auto-edit-plan-format.md) - Edit plan format reference
 - [references/doc-to-figma-template.md](references/doc-to-figma-template.md) - UI document template
+- [references/html-to-figma-parity.md](references/html-to-figma-parity.md) - HTML parity restoration guide
 - [references/bridge-plugin-setup.md](references/bridge-plugin-setup.md) - Plugin setup guide
 
 ## FAQ
