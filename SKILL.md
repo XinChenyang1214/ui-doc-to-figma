@@ -1,20 +1,20 @@
 ---
 name: ui-doc-to-figma
-description: Convert UI design documents into auto-executable Figma edit plans and apply them directly in Figma through a self-hosted bridge plugin (create page/frame/text, set layout and style, and capture node IDs). Uses task-scoped temp files and auto-cleanup, supports macOS/Linux/Windows, and does not rely on figma-use.
+description: Convert UI markdown documents or HTML files into auto-executable Figma edit plans and apply them directly in Figma through a self-hosted bridge plugin. Supports strict HTML-to-Figma parity workflow (structure/style consistency), task-scoped temp files with auto-cleanup, and macOS/Linux/Windows without figma-use.
 ---
 
 # UI Doc to Figma
 
 ## Overview
 
-Turn a UI markdown document into an executable command plan, then apply the plan directly to Figma through the local bridge plugin.
+Turn a UI markdown document or HTML file into an executable command plan, then apply the plan directly to Figma through the local bridge plugin.
 Default behavior is automatic editing, not manual guidance.
 
 ## Required Inputs
 
 Collect these inputs:
 
-1. UI document path
+1. Source path (`.md` or `.html`)
 2. Target Figma file already open in desktop app
 3. Device preset (`ios`, `android`, `web`, `ipad`)
 4. Project name (for task temp file prefix)
@@ -91,9 +91,9 @@ Cross-platform launcher note:
 - macOS/Linux: run scripts with `python3`
 - Windows (PowerShell): run scripts with `python`
 
-### Step 1: Parse UI doc into plan
+### Step 1: Parse source into plan
 
-Generate incremental operation plan from markdown:
+For markdown source, generate incremental operation plan:
 
 ```bash
 scripts/ui_doc_to_figma_plan.py \
@@ -126,6 +126,25 @@ The generated plan contains bridge-compatible operation tokens for changed targe
 3. Create/update frames for changed screens
 4. Create/update title text in changed frames
 5. Capture node IDs for traceability
+
+For HTML source, generate strict parity full-refresh plan:
+
+```bash
+scripts/html_to_figma_plan.py \
+  --input /absolute/path/to/page.html \
+  --project-name prophet \
+  --task-id task-20260212-h1 \
+  --output /tmp/auto-figma/prophet_task-20260212-h1_plan.json \
+  --frame-width 1440 \
+  --frame-height 1024
+```
+
+HTML parity contract:
+
+1. Keep DOM hierarchy in generated frame nesting.
+2. Keep inline style geometry/color/text values as first-class source of truth.
+3. Use full refresh by default for HTML (`mode=full-refresh`) to avoid stale mapping.
+4. If parity is not met, patch plan and rerun dry-run + real apply until layout/text/style matches source.
 
 ### Step 2: Execute with dry-run first
 
@@ -207,6 +226,27 @@ Key args:
 9. `--page-name`
 10. `--max-screens`
 
+### `scripts/html_to_figma_plan.py`
+
+Purpose:
+
+1. Parse HTML DOM and inline styles
+2. Build bridge-executable full-refresh plan
+3. Preserve layout/text/color structure for strict parity restoration
+
+Key args:
+
+1. `--input`
+2. `--output`
+3. `--project-name`
+4. `--task-id`
+5. `--temp-root`
+6. `--page-name`
+7. `--frame-width`
+8. `--frame-height`
+9. `--x-gap`
+10. `--y-gap`
+
 ### `scripts/figma_bridge_apply_plan.py`
 
 Purpose:
@@ -271,3 +311,4 @@ Use these files as needed:
 1. `references/auto-edit-plan-format.md`
 2. `references/doc-to-figma-template.md`
 3. `references/bridge-plugin-setup.md`
+4. `references/html-to-figma-parity.md`

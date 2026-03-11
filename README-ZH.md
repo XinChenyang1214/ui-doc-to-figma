@@ -71,7 +71,7 @@ scripts/list_open_figma_files.py
 
 #### 步骤 2: 生成编辑计划
 
-从UI Markdown文档生成Figma操作计划：
+从UI Markdown文档或HTML源码生成Figma操作计划：
 
 ```bash
 # macOS/Linux
@@ -89,6 +89,19 @@ python scripts/ui_doc_to_figma_plan.py `
   --task-id task-001 `
   --device ios `
   --output "$env:TEMP\auto-figma\my-project_task-001_plan.json"
+```
+
+
+从HTML生成（严格一致性流程）：
+
+```bash
+python3 scripts/html_to_figma_plan.py \
+  --input /path/to/page.html \
+  --project-name my-project \
+  --task-id task-html-001 \
+  --frame-width 1440 \
+  --frame-height 1024 \
+  --output /tmp/auto-figma/my-project_task-html-001_plan.json
 ```
 
 #### 步骤 3: 干运行测试
@@ -132,11 +145,13 @@ ui-doc-to-figma/
 ├── scripts/
 │   ├── ui_doc_to_figma_plan.py       # 生成编辑计划的主脚本
 │   ├── figma_bridge_apply_plan.py    # 执行编辑计划的脚本
-│   └── list_open_figma_files.py      # 列出打开的Figma文件
+│   ├── list_open_figma_files.py      # 列出打开的Figma文件
+│   └── html_to_figma_plan.py         # 从HTML生成编辑计划
 ├── references/                        # 参考文档
 │   ├── auto-edit-plan-format.md      # 编辑计划格式说明
 │   ├── bridge-plugin-setup.md        # 插件设置指南
-│   └── doc-to-figma-template.md      # UI文档模板
+│   ├── doc-to-figma-template.md      # UI文档模板
+│   └── html-to-figma-parity.md       # HTML还原一致性指南
 └── agents/
     └── openai.yaml                    # 配置文件
 ```
@@ -157,6 +172,18 @@ ui-doc-to-figma/
 - `--full-refresh`: 完全刷新（初始化时使用）
 - `--max-screens`: 最大屏幕数
 - `--page-name`: 页面名称
+
+### `scripts/html_to_figma_plan.py`
+
+从HTML文档生成Figma操作计划，目标是严格还原结构和样式。
+
+**关键参数：**
+- `--input`: HTML文档路径（必需）
+- `--output`: 输出编辑计划JSON路径
+- `--project-name`: 项目名称
+- `--task-id`: 任务ID（用于文件隔离）
+- `--frame-width`: 根画板宽度
+- `--frame-height`: 根画板高度
 
 ### `scripts/figma_bridge_apply_plan.py`
 
@@ -255,6 +282,7 @@ python scripts/figma_bridge_apply_plan.py ...
 - [SKILL.md](SKILL.md) - 详细的技能定义和工作流
 - [references/auto-edit-plan-format.md](references/auto-edit-plan-format.md) - 编辑计划格式参考
 - [references/doc-to-figma-template.md](references/doc-to-figma-template.md) - UI文档模板
+- [references/html-to-figma-parity.md](references/html-to-figma-parity.md) - HTML还原一致性指南
 - [references/bridge-plugin-setup.md](references/bridge-plugin-setup.md) - 插件设置指南
 
 ## 常见问题
